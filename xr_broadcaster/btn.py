@@ -105,298 +105,180 @@ controller_paths = (xr.Path * 2)(
     xr.string_to_path(instance, "/user/hand/left"),
     xr.string_to_path(instance, "/user/hand/right"),
 )
- 
-# 创建按键动作 - 只使用 Quest 支持的路径
-button_actions = {}
- 
-# A/B按键 (仅右手)
-button_actions['a_click'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.BOOLEAN_INPUT,
-        action_name="a_click",
-        localized_action_name="A Click",
-    ),
-)
- 
-button_actions['a_touch'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.BOOLEAN_INPUT,
-        action_name="a_touch",
-        localized_action_name="A Touch",
-    ),
-)
- 
-button_actions['b_click'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.BOOLEAN_INPUT,
-        action_name="b_click",
-        localized_action_name="B Click",
-    ),
-)
- 
-button_actions['b_touch'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.BOOLEAN_INPUT,
-        action_name="b_touch",
-        localized_action_name="B Touch",
-    ),
-)
- 
-# X/Y按键 (仅左手)
-button_actions['x_click'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.BOOLEAN_INPUT,
-        action_name="x_click",
-        localized_action_name="X Click",
-    ),
-)
- 
-button_actions['x_touch'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.BOOLEAN_INPUT,
-        action_name="x_touch",
-        localized_action_name="X Touch",
-    ),
-)
- 
-button_actions['y_click'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.BOOLEAN_INPUT,
-        action_name="y_click",
-        localized_action_name="Y Click",
-    ),
-)
- 
-button_actions['y_touch'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.BOOLEAN_INPUT,
-        action_name="y_touch",
-        localized_action_name="Y Touch",
-    ),
-)
- 
-# 扳机值 (双手)
-button_actions['trigger'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.FLOAT_INPUT,
-        action_name="trigger",
-        localized_action_name="Trigger",
-        count_subaction_paths=2,
-        subaction_paths=controller_paths,
-    ),
-)
- 
-button_actions['trigger_touch'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.BOOLEAN_INPUT,
-        action_name="trigger_touch",
-        localized_action_name="Trigger Touch",
-        count_subaction_paths=2,
-        subaction_paths=controller_paths,
-    ),
-)
- 
-# 握把 (双手)
-button_actions['grip'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.FLOAT_INPUT,
-        action_name="grip",
-        localized_action_name="Grip",
-        count_subaction_paths=2,
-        subaction_paths=controller_paths,
-    ),
-)
- 
-# 摇杆 (双手)
-button_actions['thumbstick'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.VECTOR2F_INPUT,
-        action_name="thumbstick",
-        localized_action_name="Thumbstick",
-        count_subaction_paths=2,
-        subaction_paths=controller_paths,
-    ),
-)
- 
-button_actions['thumbstick_click'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.BOOLEAN_INPUT,
-        action_name="thumbstick_click",
-        localized_action_name="Thumbstick Click",
-        count_subaction_paths=2,
-        subaction_paths=controller_paths,
-    ),
-)
- 
-button_actions['thumbstick_touch'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.BOOLEAN_INPUT,
-        action_name="thumbstick_touch",
-        localized_action_name="Thumbstick Touch",
-        count_subaction_paths=2,
-        subaction_paths=controller_paths,
-    ),
-)
- 
-# 菜单/系统按键
-button_actions['menu'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.BOOLEAN_INPUT,
-        action_name="menu",
-        localized_action_name="Menu",
-    ),
-)
- 
-button_actions['system'] = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.BOOLEAN_INPUT,
-        action_name="system",
-        localized_action_name="System",
-    ),
-)
- 
-# 控制器姿态
-controller_pose_action = xr.create_action(
-    action_set=action_set,
-    create_info=xr.ActionCreateInfo(
-        action_type=xr.ActionType.POSE_INPUT,
-        action_name="controller_pose",
-        localized_action_name="Controller Pose",
-        count_subaction_paths=2,
-        subaction_paths=controller_paths,
-    ),
-)
+
+
+# 所有按键配置表
+ACTION_CONFIG = {
+    "a_click": {
+        "type": xr.ActionType.BOOLEAN_INPUT,
+        "localized": "A Click",
+        "paths": ["/user/hand/right/input/a/click"],
+    },
+    "a_touch": {
+        "type": xr.ActionType.BOOLEAN_INPUT,
+        "localized": "A Touch",
+        "paths": ["/user/hand/right/input/a/touch"],
+    },
+    "b_click": {
+        "type": xr.ActionType.BOOLEAN_INPUT,
+        "localized": "B Click",
+        "paths": ["/user/hand/right/input/b/click"],
+    },
+    "b_touch": {
+        "type": xr.ActionType.BOOLEAN_INPUT,
+        "localized": "B Touch",
+        "paths": ["/user/hand/right/input/b/touch"],
+    },
+
+    # 左手按钮
+    "x_click": {
+        "type": xr.ActionType.BOOLEAN_INPUT,
+        "localized": "X Click",
+        "paths": ["/user/hand/left/input/x/click"],
+    },
+    "x_touch": {
+        "type": xr.ActionType.BOOLEAN_INPUT,
+        "localized": "X Touch",
+        "paths": ["/user/hand/left/input/x/touch"],
+    },
+    "y_click": {
+        "type": xr.ActionType.BOOLEAN_INPUT,
+        "localized": "Y Click",
+        "paths": ["/user/hand/left/input/y/click"],
+    },
+    "y_touch": {
+        "type": xr.ActionType.BOOLEAN_INPUT,
+        "localized": "Y Touch",
+        "paths": ["/user/hand/left/input/y/touch"],
+    },
+
+    # 扳机（双手）
+    "trigger": {
+        "type": xr.ActionType.FLOAT_INPUT,
+        "localized": "Trigger",
+        "paths": [
+            "/user/hand/left/input/trigger/value",
+            "/user/hand/right/input/trigger/value"
+        ],
+        "subaction": True,
+    },
+    "trigger_touch": {
+        "type": xr.ActionType.BOOLEAN_INPUT,
+        "localized": "Trigger Touch",
+        "paths": [
+            "/user/hand/left/input/trigger/touch",
+            "/user/hand/right/input/trigger/touch"
+        ],
+        "subaction": True,
+    },
+
+    # 握把
+    "grip": {
+        "type": xr.ActionType.FLOAT_INPUT,
+        "localized": "Grip",
+        "paths": [
+            "/user/hand/left/input/squeeze/value",
+            "/user/hand/right/input/squeeze/value"
+        ],
+        "subaction": True,
+    },
+
+    # 摇杆（二维）
+    "thumbstick": {
+        "type": xr.ActionType.VECTOR2F_INPUT,
+        "localized": "Thumbstick",
+        "paths": [
+            "/user/hand/left/input/thumbstick",
+            "/user/hand/right/input/thumbstick"
+        ],
+        "subaction": True,
+    },
+    "thumbstick_click": {
+        "type": xr.ActionType.BOOLEAN_INPUT,
+        "localized": "Thumbstick Click",
+        "paths": [
+            "/user/hand/left/input/thumbstick/click",
+            "/user/hand/right/input/thumbstick/click"
+        ],
+        "subaction": True,
+    },
+    "thumbstick_touch": {
+        "type": xr.ActionType.BOOLEAN_INPUT,
+        "localized": "Thumbstick Touch",
+        "paths": [
+            "/user/hand/left/input/thumbstick/touch",
+            "/user/hand/right/input/thumbstick/touch"
+        ],
+        "subaction": True,
+    },
+
+    # 左菜单、右系统
+    "menu": {
+        "type": xr.ActionType.BOOLEAN_INPUT,
+        "localized": "Menu",
+        "paths": ["/user/hand/left/input/menu/click"],
+    },
+    "system": {
+        "type": xr.ActionType.BOOLEAN_INPUT,
+        "localized": "System",
+        "paths": ["/user/hand/right/input/system/click"],
+    },
+
+    # 控制器姿态（双手）
+    "pose": {
+        "type": xr.ActionType.POSE_INPUT,
+        "localized": "Controller Pose",
+        "paths": [
+            "/user/hand/left/input/grip/pose",
+            "/user/hand/right/input/grip/pose"
+        ],
+        "subaction": True,
+    },
+}
+
+button_actions = {}     # name → action object
+action_types = {}       # name → action type
+
+for name, cfg in ACTION_CONFIG.items():
+    sub_paths = None
+    if cfg.get("subaction"):
+        sub_paths = (xr.Path * 2)(
+            xr.string_to_path(instance, "/user/hand/left"),
+            xr.string_to_path(instance, "/user/hand/right"),
+        )
+
+    action = xr.create_action(
+        action_set=action_set,
+        create_info=xr.ActionCreateInfo(
+            action_type=cfg["type"],
+            action_name=name,
+            localized_action_name=cfg["localized"],
+            count_subaction_paths=2 if sub_paths else 0,
+            subaction_paths=sub_paths,
+        )
+    )
+
+    # 保存动作对象
+    button_actions[name] = action
+
+    # 保存动作类型（按名称，而不是 Action 对象）
+    action_types[name] = cfg["type"]
+
  
 print("正在配置输入绑定...")
- 
+
 # Oculus Touch 控制器绑定 - 使用正确的路径
-oculus_bindings = [
-    # 姿态
-    xr.ActionSuggestedBinding(
-        action=controller_pose_action,
-        binding=xr.string_to_path(instance, "/user/hand/left/input/grip/pose"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=controller_pose_action,
-        binding=xr.string_to_path(instance, "/user/hand/right/input/grip/pose"),
-    ),
-    
-    # A/B 按键 (右手)
-    xr.ActionSuggestedBinding(
-        action=button_actions['a_click'],
-        binding=xr.string_to_path(instance, "/user/hand/right/input/a/click"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['a_touch'],
-        binding=xr.string_to_path(instance, "/user/hand/right/input/a/touch"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['b_click'],
-        binding=xr.string_to_path(instance, "/user/hand/right/input/b/click"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['b_touch'],
-        binding=xr.string_to_path(instance, "/user/hand/right/input/b/touch"),
-    ),
-    
-    # X/Y 按键 (左手)
-    xr.ActionSuggestedBinding(
-        action=button_actions['x_click'],
-        binding=xr.string_to_path(instance, "/user/hand/left/input/x/click"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['x_touch'],
-        binding=xr.string_to_path(instance, "/user/hand/left/input/x/touch"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['y_click'],
-        binding=xr.string_to_path(instance, "/user/hand/left/input/y/click"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['y_touch'],
-        binding=xr.string_to_path(instance, "/user/hand/left/input/y/touch"),
-    ),
-    
-    # 扳机
-    xr.ActionSuggestedBinding(
-        action=button_actions['trigger'],
-        binding=xr.string_to_path(instance, "/user/hand/left/input/trigger/value"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['trigger'],
-        binding=xr.string_to_path(instance, "/user/hand/right/input/trigger/value"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['trigger_touch'],
-        binding=xr.string_to_path(instance, "/user/hand/left/input/trigger/touch"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['trigger_touch'],
-        binding=xr.string_to_path(instance, "/user/hand/right/input/trigger/touch"),
-    ),
-    
-    # 握把
-    xr.ActionSuggestedBinding(
-        action=button_actions['grip'],
-        binding=xr.string_to_path(instance, "/user/hand/left/input/squeeze/value"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['grip'],
-        binding=xr.string_to_path(instance, "/user/hand/right/input/squeeze/value"),
-    ),
-    
-    # 摇杆
-    xr.ActionSuggestedBinding(
-        action=button_actions['thumbstick'],
-        binding=xr.string_to_path(instance, "/user/hand/left/input/thumbstick"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['thumbstick'],
-        binding=xr.string_to_path(instance, "/user/hand/right/input/thumbstick"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['thumbstick_click'],
-        binding=xr.string_to_path(instance, "/user/hand/left/input/thumbstick/click"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['thumbstick_click'],
-        binding=xr.string_to_path(instance, "/user/hand/right/input/thumbstick/click"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['thumbstick_touch'],
-        binding=xr.string_to_path(instance, "/user/hand/left/input/thumbstick/touch"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['thumbstick_touch'],
-        binding=xr.string_to_path(instance, "/user/hand/right/input/thumbstick/touch"),
-    ),
-    
-    # 菜单/系统按键
-    xr.ActionSuggestedBinding(
-        action=button_actions['menu'],
-        binding=xr.string_to_path(instance, "/user/hand/left/input/menu/click"),
-    ),
-    xr.ActionSuggestedBinding(
-        action=button_actions['system'],
-        binding=xr.string_to_path(instance, "/user/hand/right/input/system/click"),
-    ),
-]
+oculus_bindings = []
+
+for name, cfg in ACTION_CONFIG.items():
+    action = button_actions[name]
+    for path in cfg["paths"]:
+        oculus_bindings.append(
+            xr.ActionSuggestedBinding(
+                action=action,
+                binding=xr.string_to_path(instance, path),
+            )
+        )
  
 try:
     # 使用 Oculus Touch 控制器交互配置文件
@@ -421,6 +303,28 @@ xr.attach_session_action_sets(
     ),
 )
  
+# 获取 pose 动作对象
+POSE_NAME = "pose"
+controller_pose_action = button_actions[POSE_NAME]
+
+# 创建左右手的 action_space
+controller_pose_spaces = [
+    xr.create_action_space(
+        session=session,
+        create_info=xr.ActionSpaceCreateInfo(
+            action=controller_pose_action,
+            subaction_path=xr.string_to_path(instance, "/user/hand/left"),
+        ),
+    ),
+    xr.create_action_space(
+        session=session,
+        create_info=xr.ActionSpaceCreateInfo(
+            action=controller_pose_action,
+            subaction_path=xr.string_to_path(instance, "/user/hand/right"),
+        ),
+    ),
+]
+
 # 创建动作空间
 action_spaces = [
     xr.create_action_space(
@@ -447,6 +351,35 @@ reference_space = xr.create_reference_space(
     ),
 )
  
+# 通用动作读取函数
+def read_action_state(session, name, action, instance, sub_path=None):
+    t = action_types[name]
+
+    if sub_path:
+        get_info = xr.ActionStateGetInfo(
+            action=action,
+            subaction_path=xr.string_to_path(instance, sub_path),
+        )
+    else:
+        get_info = xr.ActionStateGetInfo(action=action)
+
+    try:
+        if t == xr.ActionType.BOOLEAN_INPUT:
+            return xr.get_action_state_boolean(session, get_info).current_state
+
+        if t == xr.ActionType.FLOAT_INPUT:
+            return xr.get_action_state_float(session, get_info).current_state
+
+        if t == xr.ActionType.VECTOR2F_INPUT:
+            v = xr.get_action_state_vector2f(session, get_info).current_state
+            return (v.x, v.y)
+    except:
+        return None
+
+
+
+
+
 session_state = xr.SessionState.UNKNOWN
 print("\n🎮 Quest 3 无头模式按键读取开始...")
 print("按键映射:")
@@ -513,229 +446,21 @@ try:
 # ... existing code ...
             # 读取右手布尔型按键 (A/B)
             try:
-                # A键
-                a_click_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(action=button_actions['a_click']),
-                )
-                
-                a_touch_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(action=button_actions['a_touch']),
-                )
-                
-                # B键
-                b_click_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(action=button_actions['b_click']),
-                )
-                
-                b_touch_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(action=button_actions['b_touch']),
-                )
-                
-                # 在try块最后统一更新panel_data
-                panel_data["右手A键"] = a_click_state.current_state
-                panel_data["右手A键触摸"] = a_touch_state.current_state
-                panel_data["右手B键"] = b_click_state.current_state
-                panel_data["右手B键触摸"] = b_touch_state.current_state
-            except Exception as e:
-                pass
+                panel_data = {
+                    "会话状态": session_state.name,
+                    "帧计数": frame_index,
+                }
 
-            # 读取左手布尔型按键 (X/Y)
-            try:
-                # X键
-                x_click_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(action=button_actions['x_click']),
-                )
-                
-                x_touch_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(action=button_actions['x_touch']),
-                )
-                
-                # Y键
-                y_click_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(action=button_actions['y_click']),
-                )
-                
-                y_touch_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(action=button_actions['y_touch']),
-                )
-                
-                # 在try块最后统一更新panel_data
-                panel_data["左手X键"] = x_click_state.current_state
-                panel_data["左手X键触摸"] = x_touch_state.current_state
-                panel_data["左手Y键"] = y_click_state.current_state
-                panel_data["左手Y键触摸"] = y_touch_state.current_state
-            except Exception as e:
-                pass
+                # 自动读取所有动作
+                for name, cfg in ACTION_CONFIG.items():
+                    act = button_actions[name]
 
-            # 读取菜单和系统键
-            try:
-                menu_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(action=button_actions['menu']),
-                )
-                
-                system_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(action=button_actions['system']),
-                )
-                
-                # 在try块最后统一更新panel_data
-                panel_data["左手菜单键"] = menu_state.current_state
-                panel_data["右手系统键"] = system_state.current_state
-            except Exception as e:
-                pass
-
-            # 读取扳机触摸
-            try:
-                left_trigger_touch_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(
-                        action=button_actions['trigger_touch'],
-                        subaction_path=xr.string_to_path(instance, "/user/hand/left"),
-                    ),
-                )
-                
-                right_trigger_touch_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(
-                        action=button_actions['trigger_touch'],
-                        subaction_path=xr.string_to_path(instance, "/user/hand/right"),
-                    ),
-                )
-                
-                # 在try块最后统一更新panel_data
-                panel_data["左手扳机触摸"] = left_trigger_touch_state.current_state
-                panel_data["右手扳机触摸"] = right_trigger_touch_state.current_state
-            except Exception as e:
-                pass
-
-            # 读取摇杆点击
-            try:
-                left_thumbstick_click_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(
-                        action=button_actions['thumbstick_click'],
-                        subaction_path=xr.string_to_path(instance, "/user/hand/left"),
-                    ),
-                )
-                
-                right_thumbstick_click_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(
-                        action=button_actions['thumbstick_click'],
-                        subaction_path=xr.string_to_path(instance, "/user/hand/right"),
-                    ),
-                )
-                
-                # 在try块最后统一更新panel_data
-                panel_data["左手摇杆点击"] = left_thumbstick_click_state.current_state
-                panel_data["右手摇杆点击"] = right_thumbstick_click_state.current_state
-            except Exception as e:
-                pass
-
-            # 读取摇杆触摸
-            try:
-                left_thumbstick_touch_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(
-                        action=button_actions['thumbstick_touch'],
-                        subaction_path=xr.string_to_path(instance, "/user/hand/left"),
-                    ),
-                )
-                
-                right_thumbstick_touch_state = xr.get_action_state_boolean(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(
-                        action=button_actions['thumbstick_touch'],
-                        subaction_path=xr.string_to_path(instance, "/user/hand/right"),
-                    ),
-                )
-                
-                # 在try块最后统一更新panel_data
-                panel_data["左手摇杆触摸"] = left_thumbstick_touch_state.current_state
-                panel_data["右手摇杆触摸"] = right_thumbstick_touch_state.current_state
-            except Exception as e:
-                pass
-
-            # 读取浮点型输入 (扳机和握把)
-            try:
-                # 左手扳机
-                left_trigger_state = xr.get_action_state_float(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(
-                        action=button_actions['trigger'],
-                        subaction_path=xr.string_to_path(instance, "/user/hand/left"),
-                    ),
-                )
-                
-                # 右手扳机
-                right_trigger_state = xr.get_action_state_float(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(
-                        action=button_actions['trigger'],
-                        subaction_path=xr.string_to_path(instance, "/user/hand/right"),
-                    ),
-                )
-                
-                # 左手握把
-                left_grip_state = xr.get_action_state_float(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(
-                        action=button_actions['grip'],
-                        subaction_path=xr.string_to_path(instance, "/user/hand/left"),
-                    ),
-                )
-                
-                # 右手握把
-                right_grip_state = xr.get_action_state_float(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(
-                        action=button_actions['grip'],
-                        subaction_path=xr.string_to_path(instance, "/user/hand/right"),
-                    ),
-                )
-                
-                # 在try块最后统一更新panel_data
-                panel_data["左手扳机"] = f"{left_trigger_state.current_state}"
-                panel_data["右手扳机"] = f"{right_trigger_state.current_state}"
-                panel_data["左手握把"] = f"{left_grip_state.current_state}"
-                panel_data["右手握把"] = f"{right_grip_state.current_state}"
-            except Exception as e:
-                pass
-
-            # 读取摇杆输入 (2D向量)
-            try:
-                thumbstick_action = button_actions['thumbstick']
-                # 一次性读取左右手摇杆数据
-                left_state = xr.get_action_state_vector2f(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(
-                        action=thumbstick_action,
-                        subaction_path=xr.string_to_path(instance, "/user/hand/left"),
-                    ),
-                )
-                
-                right_state = xr.get_action_state_vector2f(
-                    session=session,
-                    get_info=xr.ActionStateGetInfo(
-                        action=thumbstick_action,
-                        subaction_path=xr.string_to_path(instance, "/user/hand/right"),
-                    ),
-                )
-                
-                # 在try块最后统一更新panel_data
-                panel_data["左手摇杆X"] = f"{left_state.current_state.x:.2f}"
-                panel_data["左手摇杆Y"] = f"{left_state.current_state.y:.2f}"
-                panel_data["右手摇杆X"] = f"{right_state.current_state.x:.2f}"
-                panel_data["右手摇杆Y"] = f"{right_state.current_state.y:.2f}"
+                    if cfg.get("subaction"):
+                        panel_data[f"{name}_left"]  = read_action_state(session, name, act, instance, "/user/hand/left")
+                        panel_data[f"{name}_right"] = read_action_state(session, name, act, instance, "/user/hand/right")
+                    else:
+                        panel_data[name] = read_action_state(session, name, act, instance)
+            
             except Exception as e:
                 print(f"DEBUG: 读取摇杆数据时出错: {e}")
                 pass
