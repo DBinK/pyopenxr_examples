@@ -8,6 +8,7 @@ import ctypes
 import platform
 import time
 import xr
+from xr_broadcaster.panel import ControlPanel
  
 # 枚举必需的实例扩展
 extensions = [xr.MND_HEADLESS_EXTENSION_NAME]  # 允许在没有图形显示的情况下使用
@@ -454,23 +455,10 @@ print("  右手: A/B按键, 右摇杆, 右扳机, 右握把, 系统键")
 print("  同时监控所有按键的触摸事件")
 print("  按 Ctrl+C 退出\n")
  
-# 存储上次状态，避免重复打印
-last_states = {}
+# 初始化中控面板
+panel = ControlPanel(title="Quest 3 控制器状态")
+panel.start()
  
-def print_input_change(frame_index, hand_name, input_name, action_type, value=None):
-    key = f"{hand_name}_{input_name}_{action_type}"
-    if value is not None:
-        key += f"_{value:.2f}"
-    
-    if key not in last_states:
-        if value is not None:
-            if isinstance(value, tuple):  # 摇杆向量
-                print(f"[{frame_index:03d}] {hand_name} {input_name} {action_type}: ({value[0]:.2f}, {value[1]:.2f})")
-            else:  # 浮点值
-                print(f"[{frame_index:03d}] {hand_name} {input_name} {action_type}: {value:.2f}")
-        else:
-            print(f"[{frame_index:03d}] {hand_name} {input_name} {action_type}")
-        last_states[key] = True
  
 # 主循环
 try:
@@ -501,6 +489,12 @@ try:
  
         if session_state == xr.SessionState.STOPPING:
             break
+ 
+        # 准备面板数据
+        panel_data = {
+            "会话状态": session_state.name,
+            "帧计数": frame_index,
+        }
  
         if session_state == xr.SessionState.FOCUSED:
             # 同步动作状态
@@ -537,6 +531,7 @@ try:
                         session=session,
                         get_info=xr.ActionStateGetInfo(action=action),
                     )
+                    panel_data[f"{hand_name}{button_name}"] = "按下" if state.current_state else "释放"
                     if state.current_state and state.changed_since_last_sync:
                         action_type = "触摸" if "touch" in button_name else "按下"
                         print_input_change(frame_index, hand_name, button_name, action_type)
@@ -556,8 +551,9 @@ try:
                                 subaction_path=xr.string_to_path(instance, hand_path),
                             ),
                         )
+                        hand_name = "左手" if i == 0 else "右手"
+                        panel_data[f"{hand_name}{button_name}"] = "按下" if state.current_state else "释放"
                         if state.current_state and state.changed_since_last_sync:
-                            hand_name = "左手" if i == 0 else "右手"
                             action_type = "触摸" if "touch" in button_name else "按下"
                             print_input_change(frame_index, hand_name, button_name, action_type)
                 except Exception as e:
@@ -576,9 +572,10 @@ try:
                                 subaction_path=xr.string_to_path(instance, hand_path),
                             ),
                         )
+                        hand_name = "左手" if i == 0 else "右手"
+                        panel_data[f"{hand_name}{input_name}"] = f"{state.current_state:.2f}"
                         # 只在值有明显变化时打印
                         if abs(state.current_state) > 0.05 and state.changed_since_last_sync:
-                            hand_name = "左手" if i == 0 else "右手"
                             print_input_change(frame_index, hand_name, input_name, "值", state.current_state)
                 except Exception as e:
                     pass
@@ -594,28 +591,27 @@ try:
                             subaction_path=xr.string_to_path(instance, hand_path),
                         ),
                     )
-                    print(f"[{hand_path}] {state}")
-                    # 只在摇杆有明显移动时打印
+                    hand_name = "左手" if i == 0 else "右手"
+                    panel_data[f"{hand_name}摇杆X"] = f"{state.current_state.x:.2f}"
+                    panel_data[f"{hand_name}摇杆Y"] = f"{state.current_state.y:.2f}"
+                    # 简化处理：只在摇杆不在原点附近时打印
                     magnitude = (state.current_state.x**2 + state.current_state.y**2)**0.5
-                    if magnitude > 0.15 and state.changed_since_last_sync:
-                        hand_name = "左手" if i == 0 else "右手"
-                        print_input_change(
-                            frame_index, hand_name, "摇杆", "移动", 
-                            (state.current_state.x, state.current_state.y)
-                        )
+                    if magnitude > 0.15:
+                        print(f"DEBUG: {hand_name} 摇杆状态 - X: {state.current_state.x:.2f}, Y: {state.current_state.y:.2f}")
             except Exception as e:
+                print(f"DEBUG: 读取摇杆数据时出错: {e}")
                 pass
  
         elif session_state == xr.SessionState.IDLE:
             if frame_index % 60 == 0:  # 每分钟提醒一次
                 print("⏳ 等待头显激活...")
  
+        # 更新中控面板
+        panel.update(panel_data)
+ 
         # 减慢循环
         time.sleep(0.1)
         
-        # 清理旧状态以允许重复输入
-        if frame_index % 30 == 0:  # 每3秒清理一次
-            last_states.clear()
  
 except KeyboardInterrupt:
     print("\n👋 用户中断，正在退出...")
