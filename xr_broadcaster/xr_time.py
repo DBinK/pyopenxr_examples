@@ -23,7 +23,7 @@ class XRTimeProvider:
             )
         else:
             self.ts = xr.timespec()
-            self.fn = ctypes.cast(
+            self.fn = ctypes.cast( # type: ignore
                 xr.get_instance_proc_addr(
                     self.instance,
                     "xrConvertTimespecTimeToTimeKHR",
@@ -39,7 +39,7 @@ class XRTimeProvider:
             return xr_time
 
         else:
-            sec, frac = divmod(time.clock_gettime(time.CLOCK_MONOTONIC), 1)
+            sec, frac = divmod(time.clock_gettime(time.CLOCK_MONOTONIC), 1) # type: ignore
             self.ts.tv_sec = int(sec)
             self.ts.tv_nsec = int(frac * 1e9)
             xr_time = xr.Time()

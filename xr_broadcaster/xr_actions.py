@@ -21,7 +21,7 @@ class XRControllerActions:
 
         self.active_set = xr.ActiveActionSet(
             action_set=self.action_set,
-            subaction_path=xr.NULL_PATH,
+            subaction_path=xr.NULL_PATH, # type: ignore
         )
 
     def _make_action_set(self):
