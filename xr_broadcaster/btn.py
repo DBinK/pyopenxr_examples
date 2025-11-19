@@ -594,6 +594,7 @@ try:
                             subaction_path=xr.string_to_path(instance, hand_path),
                         ),
                     )
+                    print(f"[{hand_path}] {state}")
                     # 只在摇杆有明显移动时打印
                     magnitude = (state.current_state.x**2 + state.current_state.y**2)**0.5
                     if magnitude > 0.15 and state.changed_since_last_sync:
