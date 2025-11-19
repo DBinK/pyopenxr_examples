@@ -500,7 +500,7 @@ try:
             # 同步动作状态
             active_action_set = xr.ActiveActionSet(
                 action_set=action_set,
-                subaction_path=xr.NULL_PATH,
+                subaction_path=xr.NULL_PATH, # type: ignore
             )
             xr.sync_actions(
                 session=session,
@@ -532,10 +532,8 @@ try:
                         get_info=xr.ActionStateGetInfo(action=action),
                     )
                     panel_data[f"{hand_name}{button_name}"] = "按下" if state.current_state else "释放"
-                    if state.current_state and state.changed_since_last_sync:
-                        action_type = "触摸" if "touch" in button_name else "按下"
-                        print_input_change(frame_index, hand_name, button_name, action_type)
                 except Exception as e:
+                    print(f"[{frame_index:03d}] {hand_name} {button_name} 获取按键状态失败: {e}")
                     pass
  
             # 读取双手布尔型按键 (扳机触摸, 摇杆点击, 摇杆触摸)
@@ -553,10 +551,8 @@ try:
                         )
                         hand_name = "左手" if i == 0 else "右手"
                         panel_data[f"{hand_name}{button_name}"] = "按下" if state.current_state else "释放"
-                        if state.current_state and state.changed_since_last_sync:
-                            action_type = "触摸" if "touch" in button_name else "按下"
-                            print_input_change(frame_index, hand_name, button_name, action_type)
                 except Exception as e:
+                    print(f"[{frame_index:03d}]{button_name} 获取按键状态失败: {e}")
                     pass
  
             # 读取浮点型输入 (扳机和握把)
@@ -574,10 +570,8 @@ try:
                         )
                         hand_name = "左手" if i == 0 else "右手"
                         panel_data[f"{hand_name}{input_name}"] = f"{state.current_state:.2f}"
-                        # 只在值有明显变化时打印
-                        if abs(state.current_state) > 0.05 and state.changed_since_last_sync:
-                            print_input_change(frame_index, hand_name, input_name, "值", state.current_state)
                 except Exception as e:
+                    print(f"[{frame_index:03d}]{input_name} 获取输入状态失败: {e}")
                     pass
  
             # 读取摇杆输入 (2D向量)
