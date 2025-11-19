@@ -510,88 +510,266 @@ try:
                 ),
             )
  
-            # 读取单手布尔型按键 (A/B 右手, X/Y 左手, Menu 左手, System 右手)
-            single_hand_buttons = {
-                'a_click': ('右手', None),
-                'a_touch': ('右手', None), 
-                'b_click': ('右手', None),
-                'b_touch': ('右手', None),
-                'x_click': ('左手', None),
-                'x_touch': ('左手', None),
-                'y_click': ('左手', None), 
-                'y_touch': ('左手', None),
-                'menu': ('左手', None),
-                'system': ('右手', None),
-            }
-            
-            for button_name, (hand_name, _) in single_hand_buttons.items():
-                try:
-                    action = button_actions[button_name]
-                    state = xr.get_action_state_boolean(
-                        session=session,
-                        get_info=xr.ActionStateGetInfo(action=action),
-                    )
-                    panel_data[f"{hand_name}{button_name}"] = "按下" if state.current_state else "释放"
-                except Exception as e:
-                    print(f"[{frame_index:03d}] {hand_name} {button_name} 获取按键状态失败: {e}")
-                    pass
+            # 读取右手布尔型按键 (A/B)
+            try:
+                # A键
+                a_click_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(action=button_actions['a_click']),
+                )
+                panel_data["右手A键"] = "按下" if a_click_state.current_state else "释放"
+                if a_click_state.current_state and a_click_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 右手 A键 按下")
+                    
+                a_touch_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(action=button_actions['a_touch']),
+                )
+                panel_data["右手A键触摸"] = "按下" if a_touch_state.current_state else "释放"
+                if a_touch_state.current_state and a_touch_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 右手 A键 触摸")
+                    
+                # B键
+                b_click_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(action=button_actions['b_click']),
+                )
+                panel_data["右手B键"] = "按下" if b_click_state.current_state else "释放"
+                if b_click_state.current_state and b_click_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 右手 B键 按下")
+                    
+                b_touch_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(action=button_actions['b_touch']),
+                )
+                panel_data["右手B键触摸"] = "按下" if b_touch_state.current_state else "释放"
+                if b_touch_state.current_state and b_touch_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 右手 B键 触摸")
+            except Exception as e:
+                pass
  
-            # 读取双手布尔型按键 (扳机触摸, 摇杆点击, 摇杆触摸)
-            dual_hand_buttons = ['trigger_touch', 'thumbstick_click', 'thumbstick_touch']
-            for button_name in dual_hand_buttons:
-                try:
-                    action = button_actions[button_name]
-                    for i, hand_path in enumerate(["/user/hand/left", "/user/hand/right"]):
-                        state = xr.get_action_state_boolean(
-                            session=session,
-                            get_info=xr.ActionStateGetInfo(
-                                action=action,
-                                subaction_path=xr.string_to_path(instance, hand_path),
-                            ),
-                        )
-                        hand_name = "左手" if i == 0 else "右手"
-                        panel_data[f"{hand_name}{button_name}"] = "按下" if state.current_state else "释放"
-                except Exception as e:
-                    print(f"[{frame_index:03d}]{button_name} 获取按键状态失败: {e}")
-                    pass
+            # 读取左手布尔型按键 (X/Y)
+            try:
+                # X键
+                x_click_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(action=button_actions['x_click']),
+                )
+                panel_data["左手X键"] = "按下" if x_click_state.current_state else "释放"
+                if x_click_state.current_state and x_click_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 左手 X键 按下")
+                    
+                x_touch_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(action=button_actions['x_touch']),
+                )
+                panel_data["左手X键触摸"] = "按下" if x_touch_state.current_state else "释放"
+                if x_touch_state.current_state and x_touch_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 左手 X键 触摸")
+                    
+                # Y键
+                y_click_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(action=button_actions['y_click']),
+                )
+                panel_data["左手Y键"] = "按下" if y_click_state.current_state else "释放"
+                if y_click_state.current_state and y_click_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 左手 Y键 按下")
+                    
+                y_touch_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(action=button_actions['y_touch']),
+                )
+                panel_data["左手Y键触摸"] = "按下" if y_touch_state.current_state else "释放"
+                if y_touch_state.current_state and y_touch_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 左手 Y键 触摸")
+            except Exception as e:
+                pass
+ 
+            # 读取菜单和系统键
+            try:
+                menu_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(action=button_actions['menu']),
+                )
+                panel_data["左手菜单键"] = "按下" if menu_state.current_state else "释放"
+                if menu_state.current_state and menu_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 左手 菜单键 按下")
+                    
+                system_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(action=button_actions['system']),
+                )
+                panel_data["右手系统键"] = "按下" if system_state.current_state else "释放"
+                if system_state.current_state and system_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 右手 系统键 按下")
+            except Exception as e:
+                pass
+ 
+            # 读取扳机触摸
+            try:
+                left_trigger_touch_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(
+                        action=button_actions['trigger_touch'],
+                        subaction_path=xr.string_to_path(instance, "/user/hand/left"),
+                    ),
+                )
+                panel_data["左手扳机触摸"] = "按下" if left_trigger_touch_state.current_state else "释放"
+                if left_trigger_touch_state.current_state and left_trigger_touch_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 左手 扳机触摸 按下")
+                    
+                right_trigger_touch_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(
+                        action=button_actions['trigger_touch'],
+                        subaction_path=xr.string_to_path(instance, "/user/hand/right"),
+                    ),
+                )
+                panel_data["右手扳机触摸"] = "按下" if right_trigger_touch_state.current_state else "释放"
+                if right_trigger_touch_state.current_state and right_trigger_touch_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 右手 扳机触摸 按下")
+            except Exception as e:
+                pass
+ 
+            # 读取摇杆点击
+            try:
+                left_thumbstick_click_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(
+                        action=button_actions['thumbstick_click'],
+                        subaction_path=xr.string_to_path(instance, "/user/hand/left"),
+                    ),
+                )
+                panel_data["左手摇杆点击"] = "按下" if left_thumbstick_click_state.current_state else "释放"
+                if left_thumbstick_click_state.current_state and left_thumbstick_click_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 左手 摇杆点击 按下")
+                    
+                right_thumbstick_click_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(
+                        action=button_actions['thumbstick_click'],
+                        subaction_path=xr.string_to_path(instance, "/user/hand/right"),
+                    ),
+                )
+                panel_data["右手摇杆点击"] = "按下" if right_thumbstick_click_state.current_state else "释放"
+                if right_thumbstick_click_state.current_state and right_thumbstick_click_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 右手 摇杆点击 按下")
+            except Exception as e:
+                pass
+ 
+            # 读取摇杆触摸
+            try:
+                left_thumbstick_touch_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(
+                        action=button_actions['thumbstick_touch'],
+                        subaction_path=xr.string_to_path(instance, "/user/hand/left"),
+                    ),
+                )
+                panel_data["左手摇杆触摸"] = "按下" if left_thumbstick_touch_state.current_state else "释放"
+                if left_thumbstick_touch_state.current_state and left_thumbstick_touch_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 左手 摇杆触摸 按下")
+                    
+                right_thumbstick_touch_state = xr.get_action_state_boolean(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(
+                        action=button_actions['thumbstick_touch'],
+                        subaction_path=xr.string_to_path(instance, "/user/hand/right"),
+                    ),
+                )
+                panel_data["右手摇杆触摸"] = "按下" if right_thumbstick_touch_state.current_state else "释放"
+                if right_thumbstick_touch_state.current_state and right_thumbstick_touch_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 右手 摇杆触摸 按下")
+            except Exception as e:
+                pass
  
             # 读取浮点型输入 (扳机和握把)
-            float_inputs = ['trigger', 'grip']
-            for input_name in float_inputs:
-                try:
-                    action = button_actions[input_name]
-                    for i, hand_path in enumerate(["/user/hand/left", "/user/hand/right"]):
-                        state = xr.get_action_state_float(
-                            session=session,
-                            get_info=xr.ActionStateGetInfo(
-                                action=action,
-                                subaction_path=xr.string_to_path(instance, hand_path),
-                            ),
-                        )
-                        hand_name = "左手" if i == 0 else "右手"
-                        panel_data[f"{hand_name}{input_name}"] = f"{state.current_state:.2f}"
-                except Exception as e:
-                    print(f"[{frame_index:03d}]{input_name} 获取输入状态失败: {e}")
-                    pass
+            try:
+                # 左手扳机
+                left_trigger_state = xr.get_action_state_float(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(
+                        action=button_actions['trigger'],
+                        subaction_path=xr.string_to_path(instance, "/user/hand/left"),
+                    ),
+                )
+                panel_data["左手扳机"] = f"{left_trigger_state.current_state:.2f}"
+                if abs(left_trigger_state.current_state) > 0.05 and left_trigger_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 左手 扳机 值: {left_trigger_state.current_state:.2f}")
+                    
+                # 右手扳机
+                right_trigger_state = xr.get_action_state_float(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(
+                        action=button_actions['trigger'],
+                        subaction_path=xr.string_to_path(instance, "/user/hand/right"),
+                    ),
+                )
+                panel_data["右手扳机"] = f"{right_trigger_state.current_state:.2f}"
+                if abs(right_trigger_state.current_state) > 0.05 and right_trigger_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 右手 扳机 值: {right_trigger_state.current_state:.2f}")
+                    
+                # 左手握把
+                left_grip_state = xr.get_action_state_float(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(
+                        action=button_actions['grip'],
+                        subaction_path=xr.string_to_path(instance, "/user/hand/left"),
+                    ),
+                )
+                panel_data["左手握把"] = f"{left_grip_state.current_state:.2f}"
+                if abs(left_grip_state.current_state) > 0.05 and left_grip_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 左手 握把 值: {left_grip_state.current_state:.2f}")
+                    
+                # 右手握把
+                right_grip_state = xr.get_action_state_float(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(
+                        action=button_actions['grip'],
+                        subaction_path=xr.string_to_path(instance, "/user/hand/right"),
+                    ),
+                )
+                panel_data["右手握把"] = f"{right_grip_state.current_state:.2f}"
+                if abs(right_grip_state.current_state) > 0.05 and right_grip_state.changed_since_last_sync:
+                    print(f"[{frame_index:03d}] 右手 握把 值: {right_grip_state.current_state:.2f}")
+            except Exception as e:
+                pass
  
             # 读取摇杆输入 (2D向量)
             try:
                 thumbstick_action = button_actions['thumbstick']
-                for i, hand_path in enumerate(["/user/hand/left", "/user/hand/right"]):
-                    state = xr.get_action_state_vector2f(
-                        session=session,
-                        get_info=xr.ActionStateGetInfo(
-                            action=thumbstick_action,
-                            subaction_path=xr.string_to_path(instance, hand_path),
-                        ),
-                    )
-                    hand_name = "左手" if i == 0 else "右手"
-                    panel_data[f"{hand_name}摇杆X"] = f"{state.current_state.x:.2f}"
-                    panel_data[f"{hand_name}摇杆Y"] = f"{state.current_state.y:.2f}"
-                    # 简化处理：只在摇杆不在原点附近时打印
-                    magnitude = (state.current_state.x**2 + state.current_state.y**2)**0.5
-                    if magnitude > 0.15:
-                        print(f"DEBUG: {hand_name} 摇杆状态 - X: {state.current_state.x:.2f}, Y: {state.current_state.y:.2f}")
+                # 一次性读取左右手摇杆数据
+                left_state = xr.get_action_state_vector2f(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(
+                        action=thumbstick_action,
+                        subaction_path=xr.string_to_path(instance, "/user/hand/left"),
+                    ),
+                )
+                
+                right_state = xr.get_action_state_vector2f(
+                    session=session,
+                    get_info=xr.ActionStateGetInfo(
+                        action=thumbstick_action,
+                        subaction_path=xr.string_to_path(instance, "/user/hand/right"),
+                    ),
+                )
+                
+                # 更新面板数据
+                panel_data["左手摇杆X"] = f"{left_state.current_state.x:.2f}"
+                panel_data["左手摇杆Y"] = f"{left_state.current_state.y:.2f}"
+                panel_data["右手摇杆X"] = f"{right_state.current_state.x:.2f}"
+                panel_data["右手摇杆Y"] = f"{right_state.current_state.y:.2f}"
+                
+                # 打印非原点数据
+                left_magnitude = (left_state.current_state.x**2 + left_state.current_state.y**2)**0.5
+                if left_magnitude > 0.15:
+                    print(f"[{frame_index:03d}] 左手 摇杆 状态: X={left_state.current_state.x:.2f}, Y={left_state.current_state.y:.2f}")
+                    
+                right_magnitude = (right_state.current_state.x**2 + right_state.current_state.y**2)**0.5
+                if right_magnitude > 0.15:
+                    print(f"[{frame_index:03d}] 右手 摇杆 状态: X={right_state.current_state.x:.2f}, Y={right_state.current_state.y:.2f}")
             except Exception as e:
                 print(f"DEBUG: 读取摇杆数据时出错: {e}")
                 pass
