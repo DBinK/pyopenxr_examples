@@ -11,8 +11,15 @@ import time
 import platform
 import xr
 
-from rich import print
+from rich import print as rprint
+ 
+from xr_broadcaster.panel import ControlPanel
+from xr_broadcaster.visualizer import ControllerVisualizer
 
+panel = ControlPanel()
+panel.start()
+
+visualizer = ControllerVisualizer()
 
 # -- 实例 / 会话创建 ---------------------------------------------------------------
 extensions = [xr.MND_HEADLESS_EXTENSION_NAME]
@@ -171,6 +178,9 @@ reference_space = xr.create_reference_space(
 session_state = xr.SessionState.UNKNOWN
 active_action_set = xr.ActiveActionSet(action_set=action_set, subaction_path=xr.NULL_PATH)
 
+l_pose = None
+r_pose = None
+
 try:
     while True:
         # 轮询事件，跟踪会话状态变化
@@ -215,7 +225,20 @@ try:
                 )
                 if location.location_flags & xr.SPACE_LOCATION_POSITION_VALID_BIT:
                     hand = "Left" if index == 0 else "Right"
-                    print(f"{hand} controller: {location.pose}")
+                    # print(f"{hand} controller: {location.pose}")
+
+                    if index == 0:
+                        r_pose = location.pose
+                    if index == 1:
+                        l_pose = location.pose
+
+            if l_pose and r_pose:
+                panel.update({"L_xyz": l_pose.position, 
+                            "L_q": l_pose.orientation,
+                            "R_xyz": r_pose.position, 
+                            "R_q": r_pose.orientation})
+                visualizer.update(l_pose, r_pose)
+
 
             time.sleep(0.05)
 

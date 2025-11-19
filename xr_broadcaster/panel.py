@@ -19,7 +19,7 @@ class ControlPanel:
     def _make_panel(self):
         table = Table(expand=True)
         table.add_column("项目")
-        table.add_column("值", justify="right")
+        table.add_column("值")  #, justify="right")
 
         for k, v in self.data.items():
             table.add_row(str(k), str(v))
