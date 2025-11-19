@@ -457,19 +457,7 @@ try:
                 for name, cfg in ACTION_CONFIG.items():
                     act = button_actions[name]
 
-                    if cfg.get("subaction"):
-                        panel_data[f"{name}_left"] = read_action_state(
-                            session, name, act, instance, "/user/hand/left"
-                        )
-                        panel_data[f"{name}_right"] = read_action_state(
-                            session, name, act, instance, "/user/hand/right"
-                        )
-                    else:
-                        panel_data[name] = read_action_state(
-                            session, name, act, instance
-                        )
-
-                    # 特殊处理 pose
+                    # 特殊处理 pose (跳过通用处理逻辑)
                     if cfg["type"] == xr.ActionType.POSE_INPUT:
                         for side, space in zip(
                             ["left", "right"], 
@@ -500,6 +488,19 @@ try:
                                 panel_data[f"{name}_{side}_pos"] = None
                                 panel_data[f"{name}_{side}_rot"] = None
                         continue
+
+                    # 处理其他类型的输入
+                    if cfg.get("subaction"):
+                        panel_data[f"{name}_left"] = read_action_state(
+                            session, name, act, instance, "/user/hand/left"
+                        )
+                        panel_data[f"{name}_right"] = read_action_state(
+                            session, name, act, instance, "/user/hand/right"
+                        )
+                    else:
+                        panel_data[name] = read_action_state(
+                            session, name, act, instance
+                        )
                     
 
             except Exception as e:
