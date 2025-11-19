@@ -4,19 +4,29 @@ from mpl_toolkits.mplot3d import Axes3D
 from scipy.spatial.transform import Rotation as R
 
 class ControllerVisualizer:
-    def __init__(self):
+    def __init__(self, range_meters=1.0):
+        """
+        初始化控制器可视化器
+        
+        参数:
+        range_meters: float, 可视化范围(以米为单位)，默认为1.0米
+                     控制器将在[-range_meters, range_meters]的立方体空间内显示
+        """
+        # 保存范围参数
+        self.range_meters = range_meters
+        
         # 创建图形和3D轴
         self.fig = plt.figure(figsize=(10, 8))
         self.ax = self.fig.add_subplot(111, projection='3d')
         self.ax.set_title('VR Controllers 3D Visualization')
-        self.ax.set_xlabel('X')
-        self.ax.set_ylabel('Y')
-        self.ax.set_zlabel('Z')
+        self.ax.set_xlabel('X (meters)')
+        self.ax.set_ylabel('Y (meters)')
+        self.ax.set_zlabel('Z (meters)')
         
-        # 设置坐标轴范围
-        self.ax.set_xlim(-1, 1)
-        self.ax.set_ylim(0, 2)
-        self.ax.set_zlim(-1, 1)
+        # 设置固定的坐标轴范围
+        self.ax.set_xlim(-self.range_meters, self.range_meters)
+        self.ax.set_ylim(0, 2 * self.range_meters)  # Y轴从0开始到2倍范围
+        self.ax.set_zlim(-self.range_meters, self.range_meters)
         
         # 初始化图形元素
         self.left_controller_scatter = None
@@ -98,9 +108,6 @@ class ControllerVisualizer:
         # 更新图形
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
-        
-        # 自动调整视角范围
-        self._adjust_view_range(left_pos, right_pos)
 
     def _draw_coordinate_system(self, position, orientation, axes_lines, length=0.1):
         """
@@ -136,34 +143,10 @@ class ControllerVisualizer:
             )[0]
             axes_lines[i].append(line)
 
-    def _adjust_view_range(self, left_pos, right_pos):
-        """
-        自动调整视角范围以适应控制器位置
-        
-        参数:
-        left_pos: 左控制器位置
-        right_pos: 右控制器位置
-        """
-        # 计算所有控制器的坐标范围
-        all_x = [left_pos.x, right_pos.x]
-        all_y = [left_pos.y, right_pos.y]
-        all_z = [left_pos.z, right_pos.z]
-        
-        # 添加边距
-        margin = 0.3
-        x_range = (min(all_x) - margin, max(all_x) + margin)
-        y_range = (min(all_y) - margin, max(all_y) + margin)
-        z_range = (min(all_z) - margin, max(all_z) + margin)
-        
-        # 更新坐标轴范围
-        self.ax.set_xlim(x_range)
-        self.ax.set_ylim(y_range)
-        self.ax.set_zlim(z_range)
-
 # 示例用法
 if __name__ == "__main__":
-    # 创建可视化器实例
-    visualizer = ControllerVisualizer()
+    # 创建可视化器实例，设置范围为1米
+    visualizer = ControllerVisualizer(range_meters=1.0)
     
     # 示例数据
     from collections import namedtuple
