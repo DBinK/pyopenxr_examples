@@ -3,13 +3,13 @@ Quest 3 无头模式按键读取示例 (修复版)
 支持读取 ABXY、摇杆、扳机、握把等所有按键和触摸事件
 使用正确的 Oculus Touch 控制器交互配置文件
 """
- 
+
 import ctypes
 import platform
 import time
 import xr
 from xr_broadcaster.panel import ControlPanel
- 
+
 # 枚举必需的实例扩展
 extensions = [xr.MND_HEADLESS_EXTENSION_NAME]  # 允许在没有图形显示的情况下使用
 # 在无头模式下跟踪控制器需要获取当前XrTime的方法
@@ -17,30 +17,33 @@ if platform.system() == "Windows":
     extensions.append(xr.KHR_WIN32_CONVERT_PERFORMANCE_COUNTER_TIME_EXTENSION_NAME)
 else:  # Linux
     extensions.append(xr.KHR_CONVERT_TIMESPEC_TIME_EXTENSION_NAME)
- 
+
 print("正在初始化 OpenXR...")
- 
+
 # 为无头使用创建实例
-instance = xr.create_instance(xr.InstanceCreateInfo(
-    enabled_extension_names=extensions,
-))
- 
+instance = xr.create_instance(
+    xr.InstanceCreateInfo(
+        enabled_extension_names=extensions,
+    )
+)
+
 system = xr.get_system(
     instance,
     xr.SystemGetInfo(form_factor=xr.FormFactor.HEAD_MOUNTED_DISPLAY),
 )
- 
+
 session = xr.create_session(
     instance,
     xr.SessionCreateInfo(
         system_id=system,
         next=None,  # 在HEADLESS模式下不需要GraphicsBinding结构
-    )
+    ),
 )
- 
+
 # 时间转换函数设置
 if platform.system() == "Windows":
     import ctypes.wintypes
+
     pc_time = ctypes.wintypes.LARGE_INTEGER()
     kernel32 = ctypes.WinDLL("kernel32")
     pxrConvertWin32PerformanceCounterToTimeKHR = ctypes.cast(
@@ -50,7 +53,7 @@ if platform.system() == "Windows":
         ),
         xr.PFN_xrConvertWin32PerformanceCounterToTimeKHR,
     )
- 
+
     def get_xr_time():
         kernel32.QueryPerformanceCounter(ctypes.byref(pc_time))
         xr_time = xr.Time()
@@ -72,11 +75,13 @@ else:
         ),
         xr.PFN_xrConvertTimespecTimeToTimeKHR,
     )
- 
+
     def get_xr_time():
         current_time_s = time.time()
         timespecTime.tv_sec = int(current_time_s)
-        timespecTime.tv_nsec = int((current_time_s - timespecTime.tv_sec) * 1_000_000_000)
+        timespecTime.tv_nsec = int(
+            (current_time_s - timespecTime.tv_sec) * 1_000_000_000
+        )
         xr_time = xr.Time()
         result = pxrConvertTimespecTimeToTimeKHR(
             instance,
@@ -87,9 +92,10 @@ else:
         if result.is_exception():
             raise result
         return xr_time
- 
+
+
 print("正在设置动作系统...")
- 
+
 # 创建动作集
 action_set = xr.create_action_set(
     instance=instance,
@@ -99,7 +105,7 @@ action_set = xr.create_action_set(
         priority=0,
     ),
 )
- 
+
 # 定义控制器路径
 controller_paths = (xr.Path * 2)(
     xr.string_to_path(instance, "/user/hand/left"),
@@ -129,7 +135,6 @@ ACTION_CONFIG = {
         "localized": "B Touch",
         "paths": ["/user/hand/right/input/b/touch"],
     },
-
     # 左手按钮
     "x_click": {
         "type": xr.ActionType.BOOLEAN_INPUT,
@@ -151,14 +156,13 @@ ACTION_CONFIG = {
         "localized": "Y Touch",
         "paths": ["/user/hand/left/input/y/touch"],
     },
-
     # 扳机（双手）
     "trigger": {
         "type": xr.ActionType.FLOAT_INPUT,
         "localized": "Trigger",
         "paths": [
             "/user/hand/left/input/trigger/value",
-            "/user/hand/right/input/trigger/value"
+            "/user/hand/right/input/trigger/value",
         ],
         "subaction": True,
     },
@@ -167,29 +171,27 @@ ACTION_CONFIG = {
         "localized": "Trigger Touch",
         "paths": [
             "/user/hand/left/input/trigger/touch",
-            "/user/hand/right/input/trigger/touch"
+            "/user/hand/right/input/trigger/touch",
         ],
         "subaction": True,
     },
-
     # 握把
     "grip": {
         "type": xr.ActionType.FLOAT_INPUT,
         "localized": "Grip",
         "paths": [
             "/user/hand/left/input/squeeze/value",
-            "/user/hand/right/input/squeeze/value"
+            "/user/hand/right/input/squeeze/value",
         ],
         "subaction": True,
     },
-
     # 摇杆（二维）
     "thumbstick": {
         "type": xr.ActionType.VECTOR2F_INPUT,
         "localized": "Thumbstick",
         "paths": [
             "/user/hand/left/input/thumbstick",
-            "/user/hand/right/input/thumbstick"
+            "/user/hand/right/input/thumbstick",
         ],
         "subaction": True,
     },
@@ -198,7 +200,7 @@ ACTION_CONFIG = {
         "localized": "Thumbstick Click",
         "paths": [
             "/user/hand/left/input/thumbstick/click",
-            "/user/hand/right/input/thumbstick/click"
+            "/user/hand/right/input/thumbstick/click",
         ],
         "subaction": True,
     },
@@ -207,11 +209,10 @@ ACTION_CONFIG = {
         "localized": "Thumbstick Touch",
         "paths": [
             "/user/hand/left/input/thumbstick/touch",
-            "/user/hand/right/input/thumbstick/touch"
+            "/user/hand/right/input/thumbstick/touch",
         ],
         "subaction": True,
     },
-
     # 左菜单、右系统
     "menu": {
         "type": xr.ActionType.BOOLEAN_INPUT,
@@ -223,21 +224,20 @@ ACTION_CONFIG = {
         "localized": "System",
         "paths": ["/user/hand/right/input/system/click"],
     },
-
     # 控制器姿态（双手）
     "pose": {
         "type": xr.ActionType.POSE_INPUT,
         "localized": "Controller Pose",
         "paths": [
             "/user/hand/left/input/grip/pose",
-            "/user/hand/right/input/grip/pose"
+            "/user/hand/right/input/grip/pose",
         ],
         "subaction": True,
     },
 }
 
-button_actions = {}     # name → action object
-action_types = {}       # name → action type
+button_actions = {}  # name → action object
+action_types = {}  # name → action type
 
 for name, cfg in ACTION_CONFIG.items():
     sub_paths = None
@@ -255,7 +255,7 @@ for name, cfg in ACTION_CONFIG.items():
             localized_action_name=cfg["localized"],
             count_subaction_paths=2 if sub_paths else 0,
             subaction_paths=sub_paths,
-        )
+        ),
     )
 
     # 保存动作对象
@@ -264,7 +264,7 @@ for name, cfg in ACTION_CONFIG.items():
     # 保存动作类型（按名称，而不是 Action 对象）
     action_types[name] = cfg["type"]
 
- 
+
 print("正在配置输入绑定...")
 
 # Oculus Touch 控制器绑定 - 使用正确的路径
@@ -279,22 +279,26 @@ for name, cfg in ACTION_CONFIG.items():
                 binding=xr.string_to_path(instance, path),
             )
         )
- 
+
 try:
     # 使用 Oculus Touch 控制器交互配置文件
     xr.suggest_interaction_profile_bindings(
         instance=instance,
         suggested_bindings=xr.InteractionProfileSuggestedBinding(
-            interaction_profile=xr.string_to_path(instance, "/interaction_profiles/oculus/touch_controller"),
+            interaction_profile=xr.string_to_path(
+                instance, "/interaction_profiles/oculus/touch_controller"
+            ),
             count_suggested_bindings=len(oculus_bindings),
-            suggested_bindings=(xr.ActionSuggestedBinding * len(oculus_bindings))(*oculus_bindings),
+            suggested_bindings=(xr.ActionSuggestedBinding * len(oculus_bindings))(
+                *oculus_bindings
+            ),
         ),
     )
     print("✓ Oculus Touch 控制器绑定成功")
 except Exception as e:
     print(f"✗ 绑定失败: {e}")
     exit(1)
- 
+
 # 附加动作集到会话
 xr.attach_session_action_sets(
     session=session,
@@ -302,7 +306,7 @@ xr.attach_session_action_sets(
         action_sets=[action_set],
     ),
 )
- 
+
 # 获取 pose 动作对象
 POSE_NAME = "pose"
 controller_pose_action = button_actions[POSE_NAME]
@@ -342,7 +346,7 @@ action_spaces = [
         ),
     ),
 ]
- 
+
 # 创建参考空间
 reference_space = xr.create_reference_space(
     session=session,
@@ -350,7 +354,8 @@ reference_space = xr.create_reference_space(
         reference_space_type=xr.ReferenceSpaceType.STAGE,
     ),
 )
- 
+
+
 # 通用动作读取函数
 def read_action_state(session, name, action, instance, sub_path=None):
     t = action_types[name]
@@ -373,11 +378,9 @@ def read_action_state(session, name, action, instance, sub_path=None):
         if t == xr.ActionType.VECTOR2F_INPUT:
             v = xr.get_action_state_vector2f(session, get_info).current_state
             return (v.x, v.y)
-    except:
+    except xr.XrException:
+        print(f"XR Exception: {xr.XrException}")
         return None
-
-
-
 
 
 session_state = xr.SessionState.UNKNOWN
@@ -387,12 +390,12 @@ print("  左手: X/Y按键, 左摇杆, 左扳机, 左握把, 菜单键")
 print("  右手: A/B按键, 右摇杆, 右扳机, 右握把, 系统键")
 print("  同时监控所有按键的触摸事件")
 print("  按 Ctrl+C 退出\n")
- 
+
 # 初始化中控面板
 panel = ControlPanel(title="Quest 3 控制器状态")
 panel.start()
- 
- 
+
+
 # 主循环
 try:
     for frame_index in range(600):  # 运行10分钟
@@ -404,7 +407,8 @@ try:
                 if event_type == xr.StructureType.EVENT_DATA_SESSION_STATE_CHANGED:
                     event = ctypes.cast(
                         ctypes.byref(event_buffer),
-                        ctypes.POINTER(xr.EventDataSessionStateChanged)).contents
+                        ctypes.POINTER(xr.EventDataSessionStateChanged),
+                    ).contents
                     session_state = xr.SessionState(event.state)
                     print(f"📱 OpenXR会话状态: {session_state.name}")
                     if session_state == xr.SessionState.READY:
@@ -419,21 +423,21 @@ try:
                 break
             except xr.EventUnavailable:
                 break
- 
+
         if session_state == xr.SessionState.STOPPING:
             break
- 
+
         # 准备面板数据
         panel_data = {
             "会话状态": session_state.name,
             "帧计数": frame_index,
         }
- 
+
         if session_state == xr.SessionState.FOCUSED:
             # 同步动作状态
             active_action_set = xr.ActiveActionSet(
                 action_set=action_set,
-                subaction_path=xr.NULL_PATH, # type: ignore
+                subaction_path=xr.NULL_PATH,  # type: ignore
             )
             xr.sync_actions(
                 session=session,
@@ -442,9 +446,7 @@ try:
                     active_action_sets=ctypes.pointer(active_action_set),
                 ),
             )
- 
-# ... existing code ...
-            # 读取右手布尔型按键 (A/B)
+
             try:
                 panel_data = {
                     "会话状态": session_state.name,
@@ -456,31 +458,71 @@ try:
                     act = button_actions[name]
 
                     if cfg.get("subaction"):
-                        panel_data[f"{name}_left"]  = read_action_state(session, name, act, instance, "/user/hand/left")
-                        panel_data[f"{name}_right"] = read_action_state(session, name, act, instance, "/user/hand/right")
+                        panel_data[f"{name}_left"] = read_action_state(
+                            session, name, act, instance, "/user/hand/left"
+                        )
+                        panel_data[f"{name}_right"] = read_action_state(
+                            session, name, act, instance, "/user/hand/right"
+                        )
                     else:
-                        panel_data[name] = read_action_state(session, name, act, instance)
-            
+                        panel_data[name] = read_action_state(
+                            session, name, act, instance
+                        )
+
+                    # 特殊处理 pose
+                    if cfg["type"] == xr.ActionType.POSE_INPUT:
+                        for side, space in zip(
+                            ["left", "right"], 
+                            controller_pose_spaces
+                        ):
+                            try:
+                                state = xr.locate_space(
+                                    space=space,
+                                    base_space=reference_space,
+                                    time=get_xr_time(),
+                                )
+
+                                pos = state.pose.position
+                                rot = state.pose.orientation
+
+                                panel_data[f"{name}_{side}_pos"] = (
+                                    round(pos.x, 3),
+                                    round(pos.y, 3),
+                                    round(pos.z, 3),
+                                )
+                                panel_data[f"{name}_{side}_rot"] = (
+                                    round(rot.x, 3),
+                                    round(rot.y, 3),
+                                    round(rot.z, 3),
+                                    round(rot.w, 3),
+                                )
+                            except Exception as e:
+                                panel_data[f"{name}_{side}_pos"] = None
+                                panel_data[f"{name}_{side}_rot"] = None
+                        continue
+                    
+
             except Exception as e:
                 print(f"DEBUG: 读取摇杆数据时出错: {e}")
                 pass
- 
+
         elif session_state == xr.SessionState.IDLE:
             if frame_index % 60 == 0:  # 每分钟提醒一次
                 print("⏳ 等待头显激活...")
- 
+
         # 更新中控面板
         panel.update(panel_data)
- 
+
         # 减慢循环
         time.sleep(0.1)
-        
- 
+
+
 except KeyboardInterrupt:
     print("\n👋 用户中断，正在退出...")
 except Exception as e:
     print(f"❌ 发生错误: {e}")
     import traceback
+
     traceback.print_exc()
 finally:
     # 清理资源
